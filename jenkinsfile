@@ -1,0 +1,68 @@
+pipeline {
+    agent any  // Run on any available agent
+
+    environment {
+        NODE_VERSION = '18'  // Change this based on your Node.js version
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/your-repo/nodejs-express-app.git'
+            }
+        }
+
+        stage('Setup Node.js') {
+            steps {
+                script {
+                    // Install Node.js if it's not already installed
+                    def nodeInstalled = sh(script: 'node -v || echo "not found"', returnStdout: true).trim()
+                    if (nodeInstalled.contains("not found")) {
+                        sh 'curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -'
+                        sh 'apt-get install -y nodejs'
+                    }
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'npm test'
+            }
+        }
+
+        stage('Build Application') {
+            steps {
+                sh 'npm run build'  // Modify if needed
+            }
+        }
+
+        stage('Dockerize & Deploy') {
+            steps {
+                script {
+                    sh '''
+                    docker build -t my-node-app .
+                    docker stop my-node-container || true
+                    docker rm my-node-container || true
+                    docker run -d -p 3000:3000 --name my-node-container my-node-app
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Build and deployment successful!'
+        }
+        failure {
+            echo '❌ Build or deployment failed!'
+        }
+    }
+}
