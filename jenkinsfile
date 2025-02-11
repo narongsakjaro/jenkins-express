@@ -37,11 +37,11 @@ pipeline {
         //     }
         // }
 
-        stage('Build Application') {
-            steps {
-                sh 'npm run build'  // Modify if needed
-            }
-        }
+        // stage('Build Application') {
+        //     steps {
+        //         sh 'npm run build'  // Modify if needed
+        //     }
+        // }
 
         stage('Dockerize & Deploy') {
             steps {
