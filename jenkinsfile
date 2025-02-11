@@ -52,11 +52,11 @@ pipeline {
                     docker.build('my-node-app')
 
                     // Stop and remove the container if it's running
-                    def container = docker ps -q -f name=my-node-container
-                    if (container) {
+                    // def container = docker ps -q -f name=my-node-container
+                    // if (container) {
                         docker.stop('my-node-container')
                         docker.rm('my-node-container')
-                    }
+                    // }
 
                     // Run the Docker container
                     docker.run('-d -p 3000:3000 --name my-node-container my-node-app')
